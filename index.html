@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Evening Planner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#16132a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Evenings">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -20,11 +27,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-
 h1,h2,h3,.t{font-family:Sora,Inter,sans-serif}
 h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0}
 h2{font-size:22px;margin:0 0 12px}
-header{padding:20px max(5vw,16px) 0;max-width:1240px;margin:auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+header{padding:calc(20px + env(safe-area-inset-top)) max(5vw,16px,env(safe-area-inset-right)) 0;max-width:1240px;margin:auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
 nav{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:12px}
 nav a{color:var(--muted);text-decoration:none;padding:10px 14px;border-radius:9px;font-weight:600;font-size:15px;min-height:44px;display:flex;align-items:center}
 nav a[aria-current=page]{background:var(--accent);color:var(--accent-ink)}
-main{max-width:1240px;margin:auto;padding:20px max(5vw,16px) 64px}
+main{max-width:1240px;margin:auto;padding:20px max(5vw,16px) calc(64px + env(safe-area-inset-bottom))}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
 .row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
