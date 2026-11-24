@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evening Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, after-dark, practical — a tool you open at 9:30 PM with tired eyes.
+   IDEA: a night-shift run sheet — big hanging clock times, tick boxes down the side.
+   PICTURE: tonight's run sheet itself, at the top, times recomputed live from when bedtime ended.
+   COLOUR and TYPE: one deep ink-violet night palette in both themes, soft lamp-coral accent; Sora for times, Inter for text.
+   LAYOUT: modest header + tabs, then the sheet; progress = KPI row, category bars, 8-week heatmap. */
+:root{color-scheme:dark;--bg:#16132a;--panel:#201c38;--panel2:#2a2547;--line:#3a3560;--ink:#eeebf8;--muted:#aaa5c8;--accent:#ff8f7e;--accent-ink:#2a1210;
+--h0:#2a2645;--h1:#184f95;--h2:#256abf;--h3:#3987e5;--h4:#86b6ef}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.t{font-family:Sora,Inter,sans-serif}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0}
+h2{font-size:22px;margin:0 0 12px}
+header{padding:20px max(5vw,16px) 0;max-width:1240px;margin:auto;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+nav{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:12px}
+nav a{color:var(--muted);text-decoration:none;padding:10px 14px;border-radius:9px;font-weight:600;font-size:15px;min-height:44px;display:flex;align-items:center}
+nav a[aria-current=page]{background:var(--accent);color:var(--accent-ink)}
+main{max-width:1240px;margin:auto;padding:20px max(5vw,16px) 64px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input,select,textarea,button{font:inherit;font-size:16px;color:var(--ink)}
+input,select,textarea{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;min-height:44px}
+textarea{width:100%;min-height:90px;resize:vertical}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,nav a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}.small{font-size:13px}
+.sum{display:flex;flex-wrap:wrap;gap:6px 22px;margin:16px 0 6px;font-size:15px}
+.sum b{font-family:Sora,Inter,sans-serif;font-size:20px;color:var(--ink);display:block;white-space:nowrap}
+.meter{height:10px;background:var(--h0);border-radius:6px;overflow:hidden;margin:8px 0 18px}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:6px;transition:width .3s}
+.warn{background:#3b2230;border:1px solid #6b3346;color:#ffd3dc;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:15px}
+.blk{margin:22px 0 6px;font-size:13px;color:var(--muted);font-weight:600;display:flex;gap:10px;align-items:center}
+.blk::after{content:"";flex:1;height:1px;background:var(--line)}
+.it{display:grid;grid-template-columns:6.2em minmax(0,1fr) auto;gap:4px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.it .tm{font-family:Sora,Inter,sans-serif;font-size:22px;font-weight:700;white-space:nowrap;line-height:1.1}
+.it .tm small{display:block;font:500 12px Inter;color:var(--muted)}
+.it .nm{font-size:17px;font-weight:500}
+.it.done .nm{text-decoration:line-through;color:var(--muted)}
+.it.skip{opacity:.45}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-right:10px;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.acts{display:flex;gap:6px;align-items:center}
+.chk{width:44px;height:44px;border-radius:50%;padding:0;font-size:20px;line-height:1}
+.it.done .chk{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.lnk{background:none;border:0;color:var(--muted);text-decoration:underline;padding:6px;font-size:14px}
+.free{grid-column:1/-1;font-size:14px;color:var(--muted);padding:8px 0;border-bottom:1px dashed var(--line)}
+.en button{min-width:44px;padding:0}.en button.on{background:var(--accent);color:var(--accent-ink)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;margin-top:20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi .v{font-family:Sora,Inter,sans-serif;font-size:clamp(28px,4vw,38px);font-weight:700;line-height:1.1;white-space:nowrap}
+.bar{display:grid;grid-template-columns:7.5em minmax(0,1fr) 6.5em;gap:10px;align-items:center;margin:10px 0;font-size:15px}
+.bar .tr{height:14px;background:var(--h0);border-radius:4px;position:relative;overflow:hidden}
+.bar .tr i{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0}
+.bar .n{text-align:right;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.heat{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:320px}
+.heat span{aspect-ratio:1;border-radius:4px;background:var(--h0);position:relative}
+.heat span.today{outline:2px solid var(--accent);outline-offset:1px}
+.heat .hd{background:none;aspect-ratio:auto;font-size:12px;color:var(--muted);text-align:center}
+.legend{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{width:14px;height:14px;border-radius:3px;display:inline-block}
+#tip{position:fixed;pointer-events:none;background:#0d0b1a;border:1px solid var(--line);padding:6px 9px;border-radius:8px;font-size:13px;display:none;z-index:9}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:13px}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+.tabs button{flex:none}.tabs button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:600}
+.ed{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) 5em 7.5em minmax(0,1.6fr) auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.ed input[type=number]{width:100%}.ed .cb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.ed .mv{display:flex;gap:4px}.ed .mv button{min-width:40px;padding:0}
+details summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+ul.rules{margin:6px 0 0;padding-left:20px}ul.rules li{margin:6px 0}
+.hide{display:none!important}
+@media(max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}
+ .ed{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:12px 0}.ed .nm2{grid-column:1/-1}}
+@media(max-width:600px){table{font-size:13px}.it{grid-template-columns:4.6em minmax(0,1fr) auto}.it .tm{font-size:18px}.bar{grid-template-columns:5.5em minmax(0,1fr) 5.5em;font-size:13px}}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Evening Planner</h1><div class="muted small">9:30 – 11:30 PM, after bedtime</div></div>
+  <nav aria-label="Views">
+    <a href="#tonight" data-v="tonight">Tonight</a>
+    <a href="#progress" data-v="progress">Progress</a>
+    <a href="#edit" data-v="edit">Edit schedule</a>
+  </nav>
+</header>
+<main>
+  <section id="v-tonight"></section>
+  <section id="v-progress" class="hide"></section>
+  <section id="v-edit" class="hide"></section>
+</main>
+<div id="tip"></div>
+<script>
+{
+const KEY='evenings-v1';
+const DAYS=['sun','mon','tue','wed','thu','fri','sat'];
+const ORDER=['mon','tue','wed','thu','fri','sat','sun'];
+const DNAME={mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
+const PAL=['#3987e5','#d95926','#199e70','#c98500','#d55181','#0ca30c','#8f7ee8','#c4a35a'];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const B1='Momentum sprint',B2='Primary focus',B3='Skill & wind-down';
+const I=(name,cat,min,block,x={})=>({id:uid(),name,cat,min,block,keep:!!x.keep,at:x.at||''});
+const core=(tidy=15,t='Tidy')=>[I('Start laundry + dishes','home',20,B1),I(t,'home',tidy,B1)];
+const runs=()=>I('Guitar: 32nd-note runs','guitar',10,B3,{keep:true});
+function defaults(){return{v:1,
+ settings:{start:'21:30',end:'23:30',rules:[
+  '5:30 PM dinner swap: pour a chilled non-alcoholic drink before dinner so 9:30 energy holds.',
+  'No-sit transition: walk straight from the girls\' room to the washer and the sink before sitting down.',
+  'Late bedtime? Don\'t scrap the night — the planner auto-shrinks flexible blocks to fit (runs and fixed items are protected).',
+  'Palm Optimization: pre-pick one ticket during the day so coding starts immediately.',
+  'Once the iOS app ships, rename the Palm blocks to client acquisition / portfolio / outreach.']},
+ cats:[{id:'home',name:'Home',color:PAL[0]},{id:'palm',name:'Palm',color:PAL[1]},{id:'fit',name:'Fitness',color:PAL[2]},{id:'guitar',name:'Guitar',color:PAL[3]},{id:'jp',name:'Japanese',color:PAL[4]}],
+ week:{
+  mon:[...core(),I('Fitness','fit',30,B2),I('Laundry fold','home',10,B2),runs(),I('Jazz course','guitar',20,B3),I('Japanese flashcards','jp',10,B3)],
+  tue:[...core(),I('Palm: iOS app','palm',40,B2),runs(),I('PickleJar songs','guitar',20,B3),I('Japanese flashcards','jp',10,B3)],
+  wed:[...core(10,'Quick tidy'),I('Guitar: 32nd-note runs','guitar',10,B2,{keep:true}),I('PickleJar songs','guitar',25,B2),I('Japanese warm-up','jp',15,B3),I('Live Preply lesson','jp',60,B3,{at:'23:30'})],
+  thu:[...core(),I('Fitness','fit',30,B2),I('Laundry fold','home',10,B2),I('Japanese post-lesson notes','jp',15,B3),runs(),I('Jazz course','guitar',15,B3)],
+  fri:[...core(),I('Palm: iOS app','palm',40,B2),runs(),I('PickleJar songs / jam','guitar',25,B3),I('Japanese','jp',5,B3)],
+  sat:[I('Start laundry + dishes','home',20,B1),I('Weekly deep clean (bathrooms/floors)','home',35,B1),I('Palm: iOS app','palm',35,B2),runs(),I('Jazz course','guitar',25,B3),I('Japanese flashcards','jp',10,B3)],
+  sun:[...core(),I('Fitness','fit',30,B2),I('Week prep / fold','home',10,B2),runs(),I('PickleJar setlist run','guitar',20,B3),I('Japanese homework','jp',10,B3)]},
+ logs:{}}}
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.week)S=defaults();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+/* ---------- time helpers ---------- */
+const toMin=t=>{const[h,m]=String(t||'21:30').split(':').map(Number);let v=h*60+m;return v<720?v+1440:v};
+const fmt=v=>{v=((v%1440)+1440)%1440;let h=Math.floor(v/60),m=v%60,ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap};
+const dur=m=>m>=60?Math.floor(m/60)+'h'+(m%60?' '+m%60+'m':''):m+'m';
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const eveningToday=()=>{const d=new Date();if(d.getHours()<4)d.setDate(d.getDate()-1);return iso(d)};
+const dayKey=s=>DAYS[parse(s).getDay()];
+const cat=id=>S.cats.find(c=>c.id===id)||{name:'Other',color:'#888'};
+
+/* ---------- planning engine ---------- */
+function plan(items,startMin,mode,skip){
+ const list=items.filter(i=>!skip[i.id]);
+ const ai=list.findIndex(i=>i.at);
+ const winEnd=ai>=0?toMin(list[ai].at):toMin(S.settings.end);
+ const pre=ai>=0?list.slice(0,ai):list;
+ const fixed=pre.filter(i=>i.keep).reduce((a,i)=>a+ +i.min,0),flex=pre.filter(i=>!i.keep).reduce((a,i)=>a+ +i.min,0);
+ const avail=winEnd-startMin;let f=1;
+ if(mode==='auto'&&fixed+flex>avail&&flex>0)f=Math.max(.4,(avail-fixed)/flex);
+ let cur=startMin;const out=list.map((i,k)=>{
+  let d=+i.min;if(f<1&&k<(ai>=0?ai:list.length)&&!i.keep)d=Math.max(3,Math.floor(d*f));
+  let s=cur,gap=0;if(i.at){s=Math.max(cur,toMin(i.at));gap=s-cur}
+  cur=s+d;return{...i,s,d,gap}});
+ return{out,end:cur,f,winEnd,hasAnchor:ai>=0}}
+const getLog=(date,create)=>{let L=S.logs[date];if(!L&&create)L=S.logs[date]={start:S.settings.start,mode:'auto',done:{},skip:{},energy:0,note:''};return L};
+function snapshot(date){const L=S.logs[date];if(!L)return;const p=plan(S.week[dayKey(date)],toMin(L.start),L.mode,L.skip);
+ L.planned=p.out.reduce((a,i)=>a+i.d,0);L.doneMin=0;L.cats={};
+ p.out.forEach(i=>{if(L.done[i.id]){L.doneMin+=i.d;L.cats[i.cat]=(L.cats[i.cat]||0)+i.d}})}
+
+/* ---------- Tonight ---------- */
+let curDate=eveningToday();
+function renderTonight(){
+ const L=getLog(curDate)||{start:S.settings.start,mode:'auto',done:{},skip:{},energy:0,note:''};
+ const dk=dayKey(curDate),items=S.week[dk]||[];
+ const p=plan(items,toMin(L.start),L.mode,L.skip);
+ const planned=p.out.reduce((a,i)=>a+i.d,0),done=p.out.filter(i=>L.done[i.id]).reduce((a,i)=>a+i.d,0);
+ const over=p.end-toMin(S.settings.end);
+ let html=`<div class="panel"><div class="row">
+  <label class="f">Evening of<input type="date" id="t-date" value="${curDate}"></label>
+  <label class="f">Bedtime wrapped at<input type="time" id="t-start" value="${esc(L.start)}"></label>
+  <label class="f">Fit mode<select id="t-mode"><option value="auto"${L.mode==='auto'?' selected':''}>Auto-fit to ${fmt(toMin(S.settings.end))}</option><option value="full"${L.mode==='full'?' selected':''}>Full plan, run late</option></select></label>
+  <div class="f"><span class="small muted">Energy</span><div class="row en" style="gap:4px">${[1,2,3,4,5].map(n=>`<button data-en="${n}" class="${L.energy==n?'on':''}" aria-label="Energy ${n} of 5">${n}</button>`).join('')}</div></div>
+ </div>
+ <div class="sum"><span class="muted">${DNAME[dk]}<b>${dur(planned)} planned</b></span><span class="muted">Ends<b>${fmt(p.end)}</b></span><span class="muted">Done<b>${dur(done)} · ${planned?Math.round(done/planned*100):0}%</b></span>${p.f<1?`<span class="muted">Compressed<b>−${Math.round((1-p.f)*100)}% flex</b></span>`:''}</div>
+ <div class="meter" role="img" aria-label="${planned?Math.round(done/planned*100):0}% done"><i style="width:${planned?done/planned*100:0}%"></i></div>
+ ${over>0&&!p.hasAnchor?`<div class="warn">This plan runs ${dur(over)} past ${fmt(toMin(S.settings.end))}. ${L.mode==='full'?'Switch to Auto-fit, or skip':'Skip'} an item tonight to finish on time.</div>`:''}
+ ${p.hasAnchor&&p.out.some(i=>i.at&&i.s>toMin(i.at))?`<div class="warn">You'll be late for a fixed-time item — skip something before it.</div>`:''}`;
+ let lastB='';
+ const rows=items.map(it=>{const sk=!!L.skip[it.id];const c=p.out.find(o=>o.id===it.id);let h='';
+  if(it.block!==lastB){h+=`<div class="blk">${esc(it.block||'')}</div>`;lastB=it.block}
+  if(c&&c.gap>=5)h+=`<div class="free">Open time ${fmt(c.s-c.gap)} – ${fmt(c.s)} (${dur(c.gap)}) — buffer, extra reps, or rest.</div>`;
+  const C=cat(it.cat);
+  h+=`<div class="it${L.done[it.id]?' done':''}${sk?' skip':''}"><div class="tm">${c?fmt(c.s).replace(/ (AM|PM)/,''):'—'}<small>${c?(c.d!==+it.min?c.d+'m <s>'+it.min+'</s>':c.d+'m'):'skipped'}</small></div>
+   <div><div class="nm">${esc(it.name)}</div><span class="chip"><span class="dot" style="background:${C.color}"></span>${esc(C.name)}</span>${it.at?'<span class="chip">fixed '+fmt(toMin(it.at))+'</span>':''}${it.keep&&!it.at?'<span class="chip">protected</span>':''}</div>
+   <div class="acts"><button class="lnk" data-skip="${it.id}">${sk?'Restore':'Skip'}</button><button class="chk" data-done="${it.id}" aria-pressed="${!!L.done[it.id]}" aria-label="Mark ${esc(it.name)} done" ${sk?'disabled':''}>${L.done[it.id]?'✓':''}</button></div></div>`;return h}).join('');
+ html+=(items.length?rows:'<p class="muted">Nothing scheduled for this day yet — add items under Edit schedule.</p>')+
+ `<label class="f" style="margin-top:16px">Note for tonight<textarea id="t-note" placeholder="What got in the way? What went well?">${esc(L.note)}</textarea></label></div>
+ <details class="panel" style="margin-top:16px"><summary>House rules</summary><ul class="rules">${S.settings.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>`;
+ const v=document.getElementById('v-tonight');v.innerHTML=html;
+ const touch=fn=>{const L2=getLog(curDate,true);fn(L2);snapshot(curDate);save();renderTonight()};
+ v.querySelector('#t-date').onchange=e=>{if(e.target.value){curDate=e.target.value;renderTonight()}};
+ v.querySelector('#t-start').onchange=e=>touch(L2=>L2.start=e.target.value||S.settings.start);
+ v.querySelector('#t-mode').onchange=e=>touch(L2=>L2.mode=e.target.value);
+ v.querySelectorAll('[data-en]').forEach(b=>b.onclick=()=>touch(L2=>L2.energy=L2.energy==b.dataset.en?0:+b.dataset.en));
+ v.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>touch(L2=>{L2.done[b.dataset.done]=!L2.done[b.dataset.done]}));
+ v.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>touch(L2=>{const id=b.dataset.skip;L2.skip[id]=!L2.skip[id];if(L2.skip[id])delete L2.done[id]}));
+ v.querySelector('#t-note').onchange=e=>{const L2=getLog(curDate,true);L2.note=e.target.value;snapshot(curDate);save()};
+}
+
+/* ---------- Progress ---------- */
+function pct(L){return L&&L.planned?L.doneMin/L.planned:0}
+function renderProgress(){
+ const today=parse(eveningToday());
+ const back=n=>{const d=new Date(today);d.setDate(d.getDate()-n);return iso(d)};
+ let streak=0,i=pct(S.logs[back(0)])>=.5?0:1;while(pct(S.logs[back(i)])>=.5){streak++;i++}
+ const wkStart=new Date(today);wkStart.setDate(today.getDate()-((today.getDay()+6)%7));
+ const wk=[...Array(7)].map((_,k)=>{const d=new Date(wkStart);d.setDate(d.getDate()+k);return iso(d)});
+ let wp=0,wd=0;const catDone={};
+ wk.forEach(d=>{const L=S.logs[d];if(!L)return;wp+=L.planned||0;wd+=L.doneMin||0;for(const c in L.cats||{})catDone[c]=(catDone[c]||0)+L.cats[c]});
+ const catPlan={};ORDER.forEach(dk=>(S.week[dk]||[]).forEach(it=>catPlan[it.cat]=(catPlan[it.cat]||0)+ +it.min));
+ const last7=[...Array(7)].map((_,k)=>S.logs[back(k)]).filter(L=>L&&L.start);
+ const avgStart=last7.length?Math.round(last7.reduce((a,L)=>a+toMin(L.start),0)/last7.length):null;
+ const en=last7.filter(L=>L.energy);const avgEn=en.length?(en.reduce((a,L)=>a+L.energy,0)/en.length).toFixed(1):'—';
+ const lvl=p=>p<=0?'var(--h0)':p<.25?'var(--h1)':p<.5?'var(--h2)':p<.75?'var(--h3)':'var(--h4)';
+ const cells=[];const gStart=new Date(wkStart);gStart.setDate(gStart.getDate()-49);
+ for(let k=0;k<56;k++){const d=new Date(gStart);d.setDate(d.getDate()+k);const s=iso(d),L=S.logs[s],fut=d>today;
+  cells.push(`<span class="${s===iso(today)?'today':''}" style="background:${fut?'transparent':lvl(pct(L))};${fut?'border:1px dashed var(--line)':''}" data-tip="${d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}: ${L?Math.round(pct(L)*100)+'% of '+dur(L.planned||0):'no log'}"></span>`)}
+ const recent=Object.keys(S.logs).sort().reverse().slice(0,14);
+ const maxC=Math.max(1,...S.cats.map(c=>Math.max(catPlan[c.id]||0,catDone[c.id]||0)));
+ document.getElementById('v-progress').innerHTML=`
+ <div class="kpis">
+  <div class="panel kpi"><div class="small muted">Streak (≥50% done)</div><div class="v">${streak} night${streak===1?'':'s'}</div></div>
+  <div class="panel kpi"><div class="small muted">This week</div><div class="v">${wp?Math.round(wd/wp*100):0}%</div><div class="small muted">${dur(wd)} of ${dur(wp)} logged</div></div>
+  <div class="panel kpi"><div class="small muted">Avg bedtime wrap, 7 nights</div><div class="v">${avgStart?fmt(avgStart):'—'}</div><div class="small muted">plan assumes ${fmt(toMin(S.settings.start))}</div></div>
+  <div class="panel kpi"><div class="small muted">Avg energy, 7 nights</div><div class="v">${avgEn}</div></div>
+ </div>
+ <div class="grid2">
+  <div class="panel"><h2>Minutes this week by focus area</h2><p class="small muted" style="margin-top:-6px">Bar = done since Monday; marker line = full weekly plan.</p>
+  ${S.cats.map(c=>{const d=catDone[c.id]||0,p=catPlan[c.id]||0;return`<div class="bar" data-tip="${esc(c.name)}: ${d} of ${p} min"><span><span class="dot" style="background:${c.color}"></span> ${esc(c.name)}</span><span class="tr"><i style="width:${d/maxC*100}%;background:${c.color}"></i><b style="position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);left:calc(${p/maxC*100}% - 1px)"></b></span><span class="n">${dur(d)} / ${dur(p)}</span></div>`}).join('')}
+  </div>
+  <div class="panel"><h2>Last 8 weeks</h2><div class="heat">${['M','T','W','T','F','S','S'].map(x=>`<span class="hd">${x}</span>`).join('')}${cells.join('')}</div>
+  <div class="legend">0%<span style="background:var(--h0)"></span><span style="background:var(--h1)"></span><span style="background:var(--h2)"></span><span style="background:var(--h3)"></span><span style="background:var(--h4)"></span>100% of planned minutes</div></div>
+ </div>
+ <div class="panel" style="margin-top:20px"><h2>Recent nights</h2>${recent.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Wrapped</th><th class="r">Done</th><th class="r">Energy</th><th>Note</th></tr></thead><tbody>${recent.map(d=>{const L=S.logs[d];return`<tr><td style="white-space:nowrap">${parse(d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${fmt(toMin(L.start))}</td><td class="r">${Math.round(pct(L)*100)}%</td><td class="r">${L.energy||'—'}</td><td>${esc(L.note)}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="muted">No nights logged yet. Tick items off on the Tonight tab and they show up here.</p>'}</div>`;
+}
+
+/* ---------- Edit ---------- */
+let edDay=ORDER[(new Date().getDay()+6)%7];let resetArm=false;
+function renderEdit(){
+ const items=S.week[edDay];const tot=items.reduce((a,i)=>a+ +i.min,0);
+ const catOpts=sel=>S.cats.map(c=>`<option value="${esc(c.id)}"${c.id===sel?' selected':''}>${esc(c.name)}</option>`).join('');
+ const v=document.getElementById('v-edit');
+ v.innerHTML=`<div class="panel"><div class="tabs" role="tablist">${ORDER.map(d=>`<button role="tab" data-day="${d}" class="${d===edDay?'on':''}" aria-selected="${d===edDay}">${DNAME[d].slice(0,3)}</button>`).join('')}</div>
+ <div class="row" style="justify-content:space-between"><h2 style="margin:0">${DNAME[edDay]} · ${dur(tot)} <span class="muted small">(${fmt(toMin(S.settings.start))} → ${fmt(toMin(S.settings.start)+tot)} if nothing is fixed)</span></h2>
+ <div class="row"><select id="e-copy" aria-label="Copy this day to"><option value="">Copy ${DNAME[edDay]} to…</option>${ORDER.filter(d=>d!==edDay).map(d=>`<option value="${d}">${DNAME[d]}</option>`).join('')}<option value="all">All other days</option></select></div></div>
+ <p class="small muted">Protected = never shrunk when bedtime runs late. Fixed time = starts at that clock time (like the Preply lesson); anything before it gets squeezed to fit.</p>
+ <div>${items.map((it,k)=>`<div class="ed" data-i="${k}">
+  <input class="nm2" data-k="name" value="${esc(it.name)}" aria-label="Activity name">
+  <select data-k="cat" aria-label="Focus area">${catOpts(it.cat)}</select>
+  <input type="number" min="1" max="240" data-k="min" value="${it.min}" aria-label="Minutes">
+  <input type="time" data-k="at" value="${esc(it.at)}" aria-label="Fixed start time (optional)" title="Fixed start time (optional)">
+  <input data-k="block" value="${esc(it.block)}" aria-label="Block label" list="blocks">
+  <div class="mv"><label class="cb"><input type="checkbox" data-k="keep" ${it.keep?'checked':''} style="min-height:auto;width:20px;height:20px"> Protect</label><button data-mv="-1" aria-label="Move up">↑</button><button data-mv="1" aria-label="Move down">↓</button><button data-del aria-label="Delete">✕</button></div></div>`).join('')}</div>
+ <datalist id="blocks">${[...new Set(ORDER.flatMap(d=>S.week[d].map(i=>i.block)))].map(b=>`<option value="${esc(b)}">`).join('')}</datalist>
+ <div class="row" style="margin-top:12px"><button class="pri" id="e-add">Add activity</button></div></div>
+ <div class="grid2">
+  <div class="panel"><h2>Focus areas</h2>${S.cats.map((c,k)=>`<div class="row" style="margin:8px 0;align-items:center"><span class="dot" style="background:${c.color};width:16px;height:16px"></span><input data-cat="${k}" value="${esc(c.name)}" aria-label="Focus area name" style="flex:1"><span class="small muted" style="white-space:nowrap">${dur(ORDER.reduce((a,d)=>a+S.week[d].filter(i=>i.cat===c.id).reduce((x,i)=>x+ +i.min,0),0))}/wk</span></div>`).join('')}
+   ${S.cats.length<PAL.length?'<button id="e-addcat">Add focus area</button>':''}</div>
+  <div class="panel"><h2>Defaults & rules</h2><div class="row"><label class="f">Usual bedtime wrap<input type="time" id="e-start" value="${esc(S.settings.start)}"></label><label class="f">Lights out target<input type="time" id="e-end" value="${esc(S.settings.end)}"></label></div>
+   <label class="f" style="margin-top:12px">House rules (one per line)<textarea id="e-rules" rows="6">${esc(S.settings.rules.join('\n'))}</textarea></label></div>
+ </div>
+ <div class="panel" style="margin-top:20px"><h2>Backup & move between devices</h2><p class="small muted">Everything is saved in this browser. Export to back up or move your schedule and history to another device, then paste it there and Import.</p>
+  <div class="row"><button id="e-exp">Show export</button><button id="e-copyx">Copy export</button><button id="e-dl">Download .json</button><label class="f" style="flex-direction:row;align-items:center;gap:8px">Import file <input type="file" id="e-file" accept=".json,application/json"></label></div>
+  <textarea id="e-io" class="small" style="margin-top:10px" placeholder="Paste an export here, then press Import pasted"></textarea>
+  <div class="row" style="margin-top:8px"><button id="e-imp">Import pasted</button><button id="e-reset">${resetArm?'Click again to reset everything':'Reset to original schedule'}</button><span id="e-msg" class="small muted" role="status"></span></div></div>`;
+ const msg=t=>{v.querySelector('#e-msg').textContent=t};
+ v.querySelectorAll('[data-day]').forEach(b=>b.onclick=()=>{edDay=b.dataset.day;renderEdit()});
+ v.querySelectorAll('.ed').forEach(row=>{const k=+row.dataset.i,it=items[k];
+  row.querySelectorAll('[data-k]').forEach(inp=>{const f=inp.dataset.k;
+   inp.addEventListener(f==='name'||f==='block'?'input':'change',()=>{it[f]=f==='keep'?inp.checked:f==='min'?Math.max(1,+inp.value||1):inp.value;save();if(f!=='name'&&f!=='block')renderEdit()});
+   if(f==='block')inp.addEventListener('change',renderEdit)});
+  row.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const j=k+ +b.dataset.mv;if(j<0||j>=items.length)return;[items[k],items[j]]=[items[j],items[k]];save();renderEdit()});
+  row.querySelector('[data-del]').onclick=()=>{items.splice(k,1);save();renderEdit()}});
+ v.querySelector('#e-add').onclick=()=>{const last=items[items.length-1];items.push(I('New activity',S.cats[0].id,10,last?last.block:B1));save();renderEdit()};
+ v.querySelector('#e-copy').onchange=e=>{const t=e.target.value;if(!t)return;(t==='all'?ORDER.filter(d=>d!==edDay):[t]).forEach(d=>S.week[d]=items.map(i=>({...i,id:uid()})));save();renderEdit()};
+ v.querySelectorAll('[data-cat]').forEach(inp=>inp.oninput=()=>{S.cats[+inp.dataset.cat].name=inp.value;save()});
+ const ac=v.querySelector('#e-addcat');if(ac)ac.onclick=()=>{S.cats.push({id:uid(),name:'New area',color:PAL[S.cats.length]});save();renderEdit()};
+ v.querySelector('#e-start').onchange=e=>{S.settings.start=e.target.value||'21:30';save();renderEdit()};
+ v.querySelector('#e-end').onchange=e=>{S.settings.end=e.target.value||'23:30';save();renderEdit()};
+ v.querySelector('#e-rules').onchange=e=>{S.settings.rules=e.target.value.split('\n').map(s=>s.trim()).filter(Boolean);save()};
+ const io=v.querySelector('#e-io'),dump=()=>JSON.stringify(S);
+ v.querySelector('#e-exp').onclick=()=>{io.value=dump();io.select();msg('Export shown below.')};
+ v.querySelector('#e-copyx').onclick=async()=>{try{await navigator.clipboard.writeText(dump());msg('Copied to clipboard.')}catch(e){io.value=dump();io.select();msg('Clipboard blocked — export shown below, copy it manually.')}};
+ v.querySelector('#e-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([dump()],{type:'application/json'}));a.download='evenings-'+eveningToday()+'.json';document.body.appendChild(a);a.click();a.remove();msg('Download started (if your browser allows it here).')}catch(e){msg('Download blocked here — use Copy export.')}};
+ const load=txt=>{try{const d=JSON.parse(txt);if(!d.week||!d.cats)throw 0;S=d;S.logs=S.logs||{};save();msg('Imported.');renderAll()}catch(e){msg('That doesn\'t look like an Evening Planner export.')}};
+ v.querySelector('#e-imp').onclick=()=>load(io.value);
+ v.querySelector('#e-file').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(load)};
+ v.querySelector('#e-reset').onclick=()=>{if(!resetArm){resetArm=true;renderEdit();setTimeout(()=>{resetArm=false;if(view==='edit')renderEdit()},4000);return}resetArm=false;S=defaults();save();renderAll()};
+}
+
+/* ---------- routing & tooltip ---------- */
+let view='tonight';
+function renderAll(){renderTonight();renderProgress();renderEdit()}
+function route(){view=['tonight','progress','edit'].includes(location.hash.slice(1))?location.hash.slice(1):'tonight';
+ ['tonight','progress','edit'].forEach(n=>document.getElementById('v-'+n).classList.toggle('hide',n!==view));
+ document.querySelectorAll('nav a').forEach(a=>a.dataset.v===view?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+ if(view==='progress')renderProgress();if(view==='tonight')renderTonight();if(view==='edit')renderEdit()}
+window.addEventListener('hashchange',route);
+const tip=document.getElementById('tip');
+document.addEventListener('pointermove',e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(!t){tip.style.display='none';return}
+ tip.textContent=t.dataset.tip;tip.style.display='block';const x=Math.min(e.clientX+12,innerWidth-tip.offsetWidth-8);tip.style.left=x+'px';tip.style.top=(e.clientY+14)+'px'});
+renderAll();route();
+}
+</script>
+</body>
+</html>
