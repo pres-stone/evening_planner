@@ -69,6 +69,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .wbtn{border-style:dashed;color:var(--muted)}
 .note{background:#22304a;border:1px solid #2f4d7a;color:#d6e6ff;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:15px}
 .it.cut{opacity:.4}.it.cut .nm{color:var(--muted)}
+.crs{grid-column:2/-1;margin-top:4px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.crs-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.crs-l{font-size:17px;font-weight:600}
+button.sm{min-height:40px;padding:6px 12px;font-size:15px}.crs a.lnk{display:inline-flex;align-items:center;min-height:40px}
 .en button{min-width:44px;padding:0}.en button.on{background:var(--accent);color:var(--accent-ink)}
 .grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;margin-top:20px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
@@ -98,7 +101,7 @@ ul.rules{margin:6px 0 0;padding-left:20px}ul.rules li{margin:6px 0}
 .hide{display:none!important}
 @media(max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}
  .ed{grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:12px 0}.ed .nm2{grid-column:1/-1}}
-@media(max-width:600px){.wk{grid-column:1/-1}table{font-size:13px}.it{grid-template-columns:4.6em minmax(0,1fr) auto}.it .tm{font-size:18px}.bar{grid-template-columns:5.5em minmax(0,1fr) 5.5em;font-size:13px}}
+@media(max-width:600px){.wk,.crs{grid-column:1/-1}table{font-size:13px}.it{grid-template-columns:4.6em minmax(0,1fr) auto}.it .tm{font-size:18px}.bar{grid-template-columns:5.5em minmax(0,1fr) 5.5em;font-size:13px}}
 @media(prefers-reduced-motion:reduce){.meter i{transition:none}}
 </style>
 </head>
@@ -127,9 +130,10 @@ const PAL=['#3987e5','#d95926','#199e70','#c98500','#d55181','#0ca30c','#8f7ee8'
 const uid=()=>Math.random().toString(36).slice(2,9);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const B1='Momentum sprint',B2='Primary focus',B3='Skill & wind-down';
-const I=(name,cat,min,block,x={})=>({id:uid(),name,cat,min,block,keep:!!x.keep,at:x.at||'',workout:x.workout||''});
+const I=(name,cat,min,block,x={})=>({id:uid(),name,cat,min,block,keep:!!x.keep,at:x.at||'',workout:x.workout||'',course:x.course||''});
 const core=(tidy=15,t='Tidy')=>[I('Start laundry + dishes','home',20,B1),I(t,'home',tidy,B1)];
 const runs=()=>I('Guitar: 32nd-note runs','guitar',10,B3,{keep:true});
+const COURSES=[{"id":"pathfinder","name":"Jazz Guitar Pathfinder","short":"Pathfinder","url":"https://jenslarsen.thinkific.com/enrollments","pos":0,"ch":[{"t":"The Song & The Basics","l":["Intro - Goals","PDF and mp3 Downloads","The Song & A Bit About Why","Bb Major Scale","Bb Major - 3rds Ascending","Bb Major - 3rds Descending","Bb Major - Triads Ascending","Bb Major - Triads Descending","Bb Major - 7th Chords Ascending","Bb Major - 7th Chords Descending","Learn The Melody And The Chords","The Melody","The Chords","Limitation Exercises","Two Notes On The Song","Homework"]},{"t":"Harmonic Minor & Dominants","l":["Intro","PDF and mp3 Downloads","Harmonic minor & Scale Exercises","G Harmonic Minor Scale","G Harmonic Minor - 3rds Ascending","G Harmonic Minor - 3rds Descending","G Harmonic Minor - Triads Ascending","G Harmonic Minor - Triads Descending","G Harmonic Minor - 7th Chords Ascending","G Harmonic Minor - 7th Chords Descending","Chunks","2 Chunk Exercise","Dominants - When Minor Needs To Get Harmonic","D7 Licks","Why Limitation Exercises Will Change How You Play","2-Note Solo","Homework"]},{"t":"Beautiful Melodic Minor","l":["Intro","PDF and mp3 Downloads","Tonic Minor","G Melodic Minor Scale","G Melodic Minor - 3rds Ascending","G Melodic Minor - 3rds Descending","G Melodic Minor - Triads Ascending","G Melodic Minor - Triads Descending","G Melodic Minor - 7th Chords Ascending","G Melodic Minor - 7th Chords Descending","5 Melodic Minor Jazz Licks","Breakdown Of The Phrases","Arpeggios On The Song","How To Improvise With Arpeggios","Arpeggios Solo","Homework"]},{"t":"Barry Harris & Minor II V Is","l":["Intro","PDF and mp3 Downloads","Barry Harris Exercise - Arpeggio With Stuffing","Barry Harris Exercise","Analysis Of Autumn Leaves","5 Minor II V I Licks","Breaking Down Minor II V I Licks","Making Lines - Connecting Chords","Solo","Homework"]},{"t":"Half-step Heaven (Chromatic Phrases)","l":["Intro","PDF and mp3 Downloads","Barry's Chromatic Scale - All 3 scales","3 Minor II V I licks","Breakdown Of The Licks","\"Boring\" Chromatic Enclosures","Short Chromatic Enclosures Exercise","Long Chromatic Enclosures","Long Chromatic Enclosures Exercise","Extra Dominants: G7(b9) - How And Where","3 G7(b9) Lines back to Cm7","Breakdown of the G7(b9) Lines","Solo","Homework"]},{"t":"First Steps Outside","l":["Intro","PDF and mp3 Downloads","\"Outside\" F7 From Minor","3 F7(b9,b13) Licks","Breakdown F7 Licks","Pivot Arpeggios","Pivot Arpeggios On The Song","3 Pivot Licks","Breakdown Pivot Licks","Solo","Homework"]},{"t":"Altered Dominants","l":["Intro","PDF and mp3 Downloads","Altered Scale Lesson","Altered II V I Licks","Breakdown II V I licks","Ebmaj7 on Aø Licks","Breakdown Ebmaj7 over Aø licks","Solo","Homework"]},{"t":"Altered Motifs","l":["Intro","PDF and mp3 Downloads","(F7b9,b13) - Pivot Arpeggio Licks","Breakdown Pivot Arpeggio Licks","3 Motivic Altered Licks","Breakdown Motivic Altered Licks","The Fast Moving Changes","5 Licks on The Fast Moving Changes","Breakdown The Fast Moving Licks","Solo","Homework"]}]},{"id":"craft","name":"Jazz Chord Craftsmanship","short":"Chord Craftsmanship","url":"https://jenslarsen.thinkific.com/enrollments","pos":0,"ch":[{"t":"Shell-Voicing Basics","l":["Getting Started With Basic Shell-Voicings","Sheet Music and Backing Tracks","C Major Diatonic Shell Voicings - 5th String Root","C Major Diatonic Shell Voicings - 6th String Root","Diatonic Shell-voicings in 3rds - 5th string root","Diatonic Shell-voicings in 3rds - 6th string root","Practicing Shell-voicing in other keys","Think in groups of Chords: II V I","II V I Cycle #1 - Root on the 6th string","II V I Cycle #1 - Root on the 5th string","Solar - Form and Harmony","Afternoon In Paris - Form and Harmony","Basic Syncopation - The Charleston Rhythm","Charleston Rhythm on Solar","Chapter 1 - Homework"]},{"t":"The Unfair Advantage of Shells","l":["Splitting the chord","Sheet Music and Backing Tracks","Splitting all the chords + Right-hand technique","Basic 1-bar patterns #1-#3","Hearing Rhythms in Chunks","3 Turnarounds with 1-bar Chunks","Secondary Dominants Explained","Turnarounds with V of V","3 Fast Turnarounds","Solar with 2-layer comping","Learning To Practice With 2&4 Metronome","Chapter 2 - Homework"]},{"t":"Rootless Voicings & Rhythm","l":["Rootless voicings","Sheet Music and Backing Tracks","Shell To Rootless Voicings - 5th String","Shell To Rootless Voicings - 6th String","Rootless II V I Cycle #1","Rootless II V I Cycle #2","Rootless Voicings And Rhythms - Ladybird","Ladybird Harmonic Analysis (Minor Subdominant chords)","Rootless Voicings And Rhythms - Afternoon In Paris","Chapter 3 - Homework"]},{"t":"Adding Melody To Your Comping","l":["Adding More Melody To Your Chords - Overview","Sheet Music and Backing Tracks","Making Half-note Exercises","Half-note exercise on Ladybird","Tonic Minor and Dominants Resolving To Minor","Breakdown of Half-note Exercise on Solar","Half-note Exercise Solar","Rhythms and Thinking Longer Phrases","Ladybird Rhythm Etude","Chapter 4 - Homework"]},{"t":"Bring Together Melody & Rhythm","l":["Let Melody & Rhythm Boost Each Other!","Sheet Music and Backing Tracks","Bernie's Tune - Form and Harmony","Half-note Exercise Bernie's Tune","An Important Part of Comping: The Riff","Riff with Conclusion - Solar","Riff with Conclusion - Ladybird","Chapter 5 - Homework"]},{"t":"Extend The Melodic Range & Rhythm","l":["The Full Range Of Melody Notes","Sheet Music and Backing Tracks","10 Major II V I exercises","10 Minor II V I exercises","Half-note Exercise Bernie's Tune","Call-Response - Making Rhythm and Chords Melodic","Afternoon In Paris - Call Response","Chapter 6 - Homework"]},{"t":"Chromatic Passing Chords","l":["Chromatic Passing Chords - Morten's exercise","Sheet Music and Backing Tracks","Important Rhythm: Anticipated Chords","Turnaround Exercise With Anticipated Rhythm","3 II V I Examples With Anticipated Chords","Chromatic Passing Chords - 5 II V I examples","Solar Call-Response with Chromatic Passing Chords","Ladybird with Chromatic Passing Chords","Chapter 7 - Homework"]},{"t":"Advanced Duo Comping","l":["Advanced Duo Comping - Complete Voicings 2.0","Sheet Music and Backing Tracks","5 Major II V I examples","5 Minor II V I examples","Bernie's Tune - Duo Comping","Bernie's Tune - Breakdown","Ladybird - Duo Comping","Ladybird - Breakdown","Chapter 8 - Homework"]},{"t":"Diatonic Passing Chords","l":["What are Diatonic Passing Chords?","Sheet Music and Backing Tracks","5 Major II V I examples","3 Minor II V I examples","Solar - Diatonic Passing Chords","Solar - Breakdown","Ladybird - Diatonic Passing Chords","Ladybird Breakdown","Chapter 9 - Homework"]},{"t":"Inner-voice & Chromatic Voice-leading","l":["Inner-voice Movement Introduction","Sheet Music and Backing Tracks","10 Inner Voice Concepts & Melodies","Rootless II V I Examples - Chromatic Voice Leading","Afternoon In Paris - Chromatic Voice Leading","Afternoon In Paris - Breakdown part 1","Afternoon In Paris - Breakdown part 2","Bernie's Tune - Chromatic Voice Leading","Bernie's Tune - Breakdown","Chapter 10 - Homework"]}]}];
 const WK=['Strength','Kettlebell','Mobility','Cardio','Core'];
 function defaults(){return{v:1,
  settings:{start:'21:30',end:'23:30',workouts:WK.slice(),rules:[
@@ -140,18 +144,27 @@ function defaults(){return{v:1,
   'Once the iOS app ships, rename the Palm blocks to client acquisition / portfolio / outreach.']},
  cats:[{id:'home',name:'Home',color:PAL[0]},{id:'palm',name:'Palm',color:PAL[1]},{id:'fit',name:'Fitness',color:PAL[2]},{id:'guitar',name:'Guitar',color:PAL[3]},{id:'jp',name:'Japanese',color:PAL[4]}],
  week:{
-  mon:[...core(),I('Fitness','fit',30,B2,{workout:'Strength'}),I('Laundry fold','home',10,B2),runs(),I('Jazz course','guitar',20,B3),I('Japanese flashcards','jp',10,B3)],
+  mon:[...core(),I('Fitness','fit',30,B2,{workout:'Strength'}),I('Laundry fold','home',10,B2),runs(),I('Jazz course','guitar',20,B3,{course:'rotate'}),I('Japanese flashcards','jp',10,B3)],
   tue:[...core(),I('Palm: iOS app','palm',40,B2),runs(),I('PickleJar songs','guitar',20,B3),I('Japanese flashcards','jp',10,B3)],
   wed:[...core(10,'Quick tidy'),I('Guitar: 32nd-note runs','guitar',10,B2,{keep:true}),I('PickleJar songs','guitar',25,B2),I('Japanese warm-up','jp',15,B3),I('Live Preply lesson','jp',60,B3,{at:'23:30'})],
-  thu:[...core(),I('Fitness','fit',30,B2,{workout:'Kettlebell'}),I('Laundry fold','home',10,B2),I('Japanese post-lesson notes','jp',15,B3),runs(),I('Jazz course','guitar',15,B3)],
+  thu:[...core(),I('Fitness','fit',30,B2,{workout:'Kettlebell'}),I('Laundry fold','home',10,B2),I('Japanese post-lesson notes','jp',15,B3),runs(),I('Jazz course','guitar',15,B3,{course:'rotate'})],
   fri:[...core(),I('Palm: iOS app','palm',40,B2),runs(),I('PickleJar songs / jam','guitar',25,B3),I('Japanese','jp',5,B3)],
-  sat:[I('Start laundry + dishes','home',20,B1),I('Weekly deep clean (bathrooms/floors)','home',35,B1),I('Palm: iOS app','palm',35,B2),runs(),I('Jazz course','guitar',25,B3),I('Japanese flashcards','jp',10,B3)],
+  sat:[I('Start laundry + dishes','home',20,B1),I('Weekly deep clean (bathrooms/floors)','home',35,B1),I('Palm: iOS app','palm',35,B2),runs(),I('Jazz course','guitar',25,B3,{course:'rotate'}),I('Japanese flashcards','jp',10,B3)],
   sun:[...core(),I('Fitness','fit',30,B2,{workout:'Mobility'}),I('Week prep / fold','home',10,B2),runs(),I('PickleJar setlist run','guitar',20,B3),I('Japanese homework','jp',10,B3)]},
- logs:{}}}
+ courses:JSON.parse(JSON.stringify(COURSES)),logs:{}}}
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!S||!S.week)S=defaults();
 if(!S.settings.workouts)S.settings.workouts=WK.slice();
+if(!S.courses){S.courses=JSON.parse(JSON.stringify(COURSES));for(const d in S.week)S.week[d].forEach(i=>{if(!i.course&&/jazz course/i.test(i.name))i.course='rotate'})}
+const lessons=c=>c.ch.flatMap((ch,ci)=>ch.l.map(t=>({ci,ct:ch.t,t})));
+const LCACHE={};const lz=c=>LCACHE[c.id]&&LCACHE[c.id].n===c.ch?LCACHE[c.id].v:(LCACHE[c.id]={n:c.ch,v:lessons(c)}).v;
+const courseById=id=>S.courses.find(c=>c.id===id);
+function courseFor(it,date,L){const e=L&&L.course&&L.course[it.id];if(e&&courseById(e.id))return courseById(e.id);
+ if(it.course&&it.course!=='rotate')return courseById(it.course)||S.courses[0];
+ const open=S.courses.filter(c=>c.pos<lz(c).length);const pool=open.length?open:S.courses;
+ const last={};for(const d of Object.keys(S.logs)){if(d===date)continue;const ce=S.logs[d].course||{};for(const k in ce){const id=ce[k].id;if(!last[id]||d>last[id])last[id]=d}}
+ return pool.slice().sort((a,b)=>(last[a.id]||'')<(last[b.id]||'')?-1:(last[a.id]||'')>(last[b.id]||'')?1:0)[0]}
 const isFit=it=>it.cat==='fit'||/fitness|workout/i.test(cat(it.cat).name);
 const lastDetail=type=>{for(const d of Object.keys(S.logs).sort().reverse()){const w=S.logs[d].workouts||{};for(const k in w)if(w[k].type===type&&w[k].detail)return w[k].detail}return''};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
@@ -192,6 +205,14 @@ let curDate=eveningToday();
 function wkUI(it,L){const w=(L.workouts||{})[it.id]||{type:'',detail:''};const planned=it.workout;
  return `<div class="wk"><div class="wkt" role="group" aria-label="Workout type">${S.settings.workouts.map(t=>`<button data-wt="${it.id}" data-t="${esc(t)}" class="${w.type===t?'on':!w.type&&planned===t?'plan':''}" aria-pressed="${w.type===t}">${esc(t)}</button>`).join('')}</div>
  <input data-wd="${it.id}" value="${esc(w.detail)}" placeholder="${esc((w.type||planned)?('What you did, e.g. '+(lastDetail(w.type||planned)||'swings 5×15, goblet squat 3×10')):'What you did')}" aria-label="Workout details"></div>`}
+function courseUI(it,L,date){const c=courseFor(it,date,L);if(!c)return'';const ls=lz(c),e=(L.course||{})[it.id],fin=e?e.fin:[];
+ const cur=ls[c.pos],other=S.courses.find(x=>x!==c);
+ return `<div class="crs"><div class="crs-h"><b>${esc(c.name)}</b><span class="small muted">${Math.min(c.pos,ls.length)}/${ls.length} lessons</span></div>
+ ${cur?`<div class="small muted">Chapter ${cur.ci+1} · ${esc(cur.ct)}</div><div class="crs-l">Next: ${esc(cur.t)}</div>`:'<div class="crs-l">Course complete — nice work.</div>'}
+ ${fin.length?`<div class="small">Finished tonight: ${fin.map(i=>esc(ls[i]?ls[i].t:'')).join(', ')}</div>`:''}
+ <div class="row" style="gap:6px">${cur?`<button class="pri sm" data-cfin="${it.id}">Finished lesson → next</button>`:''}${fin.length?`<button class="sm" data-cundo="${it.id}">Undo last</button>`:''}
+ ${!fin.length&&other?`<button class="lnk" data-csw="${it.id}" data-to="${esc(other.id)}">Do ${esc(other.short||other.name)} instead</button>`:''}
+ <a class="lnk" href="${esc(c.url)}" target="_blank" rel="noopener">Open courses ↗</a></div></div>`}
 function renderTonight(){
  const L=getLog(curDate)||{start:S.settings.start,mode:'auto',done:{},skip:{},energy:0,note:''};
  const dk=dayKey(curDate),items=S.week[dk]||[];
@@ -218,7 +239,7 @@ function renderTonight(){
   const C=cat(it.cat);
   h+=`<div class="it${L.done[it.id]?' done':''}${sk?' skip':''}${cut?' cut':''}"><div class="tm">${c?fmt(c.s).replace(/ (AM|PM)/,''):'—'}<small>${c?(c.d!==+it.min?c.d+'m <s>'+it.min+'</s>':c.d+'m'):'skipped'}</small></div>
    <div><div class="nm">${esc(it.name)}</div><span class="chip"><span class="dot" style="background:${C.color}"></span>${esc(C.name)}</span>${it.at?'<span class="chip">fixed '+fmt(toMin(it.at))+'</span>':''}${it.keep&&!it.at?'<span class="chip">protected</span>':''}</div>
-   <div class="acts">${cut?'<span class="small muted">night ended</span>':`<button class="lnk" data-skip="${it.id}">${sk?'Restore':'Skip'}</button>`}<button class="chk" data-done="${it.id}" aria-pressed="${!!L.done[it.id]}" aria-label="Mark ${esc(it.name)} done" ${sk||cut?'disabled':''}>${L.done[it.id]?'✓':''}</button></div>${isFit(it)&&!sk&&!cut?wkUI(it,L):''}</div>`;return h}).join('');
+   <div class="acts">${cut?'<span class="small muted">night ended</span>':`<button class="lnk" data-skip="${it.id}">${sk?'Restore':'Skip'}</button>`}<button class="chk" data-done="${it.id}" aria-pressed="${!!L.done[it.id]}" aria-label="Mark ${esc(it.name)} done" ${sk||cut?'disabled':''}>${L.done[it.id]?'✓':''}</button></div>${isFit(it)&&!sk&&!cut?wkUI(it,L):''}${it.course&&!sk&&!cut&&S.courses.length?courseUI(it,L,curDate):''}</div>`;return h}).join('');
  html+=(items.length?rows:'<p class="muted">Nothing scheduled for this day yet — add items under Edit schedule.</p>')+
  `<label class="f" style="margin-top:16px">Note for tonight<textarea id="t-note" placeholder="What got in the way? What went well?">${esc(L.note)}</textarea></label></div>
  <details class="panel" style="margin-top:16px"><summary>House rules</summary><ul class="rules">${S.settings.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>`;
@@ -228,7 +249,12 @@ function renderTonight(){
  v.querySelector('#t-start').onchange=e=>touch(L2=>L2.start=e.target.value||S.settings.start);
  v.querySelector('#t-mode').onchange=e=>touch(L2=>L2.mode=e.target.value);
  v.querySelectorAll('[data-en]').forEach(b=>b.onclick=()=>touch(L2=>L2.energy=L2.energy==b.dataset.en?0:+b.dataset.en));
- v.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>touch(L2=>{L2.done[b.dataset.done]=!L2.done[b.dataset.done]}));
+ const lock=(L2,id)=>{const it=items.find(x=>x.id===id);L2.course=L2.course||{};if(!L2.course[id])L2.course[id]={id:courseFor(it,curDate,L2).id,fin:[]};return L2.course[id]};
+ v.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>touch(L2=>{const id=b.dataset.done;L2.done[id]=!L2.done[id];const it=items.find(x=>x.id===id);
+  if(it&&it.course&&S.courses.length){if(L2.done[id])lock(L2,id);else if(L2.course&&L2.course[id]&&!L2.course[id].fin.length)delete L2.course[id]}}));
+ v.querySelectorAll('[data-cfin]').forEach(b=>b.onclick=()=>touch(L2=>{const id=b.dataset.cfin,e=lock(L2,id),c=courseById(e.id);if(c.pos<lz(c).length){e.fin.push(c.pos);c.pos++}L2.done[id]=true}));
+ v.querySelectorAll('[data-cundo]').forEach(b=>b.onclick=()=>touch(L2=>{const id=b.dataset.cundo,e=L2.course[id],c=courseById(e.id);const i=e.fin.pop();if(i!=null&&c.pos===i+1)c.pos=i}));
+ v.querySelectorAll('[data-csw]').forEach(b=>b.onclick=()=>touch(L2=>{L2.course=L2.course||{};L2.course[b.dataset.csw]={id:b.dataset.to,fin:[]}}));
  v.querySelectorAll('[data-skip]').forEach(b=>b.onclick=()=>touch(L2=>{const id=b.dataset.skip;L2.skip[id]=!L2.skip[id];if(L2.skip[id])delete L2.done[id]}));
  v.querySelectorAll('[data-wt]').forEach(b=>b.onclick=()=>touch(L2=>{L2.workouts=L2.workouts||{};const id=b.dataset.wt,t=b.dataset.t,w=L2.workouts[id]||{type:'',detail:''};
   if(w.type===t){w.type=''}else{w.type=t;if(!w.detail)w.detail=lastDetail(t)}L2.workouts[id]=w}));
@@ -284,6 +310,9 @@ function renderProgress(){
   ${wTypes.map(t=>`<div class="bar" data-tip="${esc(t)}: ${wc[t]||0} sessions"><span>${esc(t)}</span><span class="tr"><i style="width:${(wc[t]||0)/wMax*100}%;background:#199e70"></i></span><span class="n">${wc[t]||0}×</span></div>`).join('')}
   ${w30.length?'':'<p class="small muted">Pick a workout type on a fitness item tonight and tick it done — it shows up here.</p>'}</div>
   <div class="panel"><h2>Workout log</h2>${wl.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Type</th><th>What you did</th></tr></thead><tbody>${wl.slice(0,12).map(x=>`<tr><td style="white-space:nowrap">${parse(x.d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${esc(x.type)}</td><td>${esc(x.detail)||'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted small">No workouts logged yet.</p>'}</div></div>
+ ${S.courses.length?`<div class="panel" style="margin-top:20px"><h2>Courses</h2>${S.courses.map(c=>{const ls=lz(c),n=ls.length,cur=ls[c.pos];let f30=0;Object.keys(S.logs).forEach(d=>{if(d<back(29))return;const ce=S.logs[d].course||{};for(const k in ce)if(ce[k].id===c.id)f30+=ce[k].fin.length});
+  return `<div class="bar" style="grid-template-columns:minmax(0,12em) minmax(0,1fr) 6.5em" data-tip="${esc(c.name)}: ${c.pos} of ${n} lessons"><span>${esc(c.short||c.name)}</span><span class="tr"><i style="width:${c.pos/n*100}%;background:#c98500"></i></span><span class="n">${Math.round(c.pos/n*100)}%</span></div>
+  <p class="small muted" style="margin:-4px 0 12px">${cur?`Up next: Ch ${cur.ci+1} · ${esc(cur.t)}`:'Complete'} · ${f30} lesson${f30===1?'':'s'} finished in the last 30 days</p>`}).join('')}</div>`:''}
  <div class="panel" style="margin-top:20px"><h2>Recent nights</h2>${recent.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Wrapped</th><th>Wake-up</th><th class="r">Done</th><th class="r">Energy</th><th>Note</th></tr></thead><tbody>${recent.map(d=>{const L=S.logs[d];return`<tr><td style="white-space:nowrap">${parse(d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${fmt(toMin(L.start))}</td><td style="white-space:nowrap">${L.wake?fmt(toMin(L.wake)):'—'}</td><td class="r">${Math.round(pct(L)*100)}%</td><td class="r">${L.energy||'—'}</td><td>${esc(L.note)}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="muted">No nights logged yet. Tick items off on the Tonight tab and they show up here.</p>'}</div>`;
 }
 
@@ -303,7 +332,7 @@ function renderEdit(){
   <input type="number" min="1" max="240" data-k="min" value="${it.min}" aria-label="Minutes">
   <input type="time" data-k="at" value="${esc(it.at)}" aria-label="Fixed start time (optional)" title="Fixed start time (optional)">
   <input data-k="block" value="${esc(it.block)}" aria-label="Block label" list="blocks">
-  <div class="mv"><label class="cb"><input type="checkbox" data-k="keep" ${it.keep?'checked':''} style="min-height:auto;width:20px;height:20px"> Protect</label><button data-mv="-1" aria-label="Move up">↑</button><button data-mv="1" aria-label="Move down">↓</button><button data-del aria-label="Delete">✕</button></div>${isFit(it)?`<label class="cb nm2" style="grid-column:1/-1">Planned workout <select data-k="workout" style="min-height:36px">${['',...S.settings.workouts].map(t=>`<option value="${esc(t)}"${t===(it.workout||'')?' selected':''}>${t?esc(t):'Decide on the night'}</option>`).join('')}</select></label>`:''}</div>`).join('')}</div>
+  <div class="mv"><label class="cb"><input type="checkbox" data-k="keep" ${it.keep?'checked':''} style="min-height:auto;width:20px;height:20px"> Protect</label><button data-mv="-1" aria-label="Move up">↑</button><button data-mv="1" aria-label="Move down">↓</button><button data-del aria-label="Delete">✕</button></div>${it.cat==='guitar'&&S.courses.length?`<label class="cb nm2" style="grid-column:1/-1">Course <select data-k="course" style="min-height:36px">${[['','None'],['rotate','Rotate between courses'],...S.courses.map(c=>[c.id,c.name])].map(([v,t])=>`<option value="${esc(v)}"${v===(it.course||'')?' selected':''}>${esc(t)}</option>`).join('')}</select></label>`:''}${isFit(it)?`<label class="cb nm2" style="grid-column:1/-1">Planned workout <select data-k="workout" style="min-height:36px">${['',...S.settings.workouts].map(t=>`<option value="${esc(t)}"${t===(it.workout||'')?' selected':''}>${t?esc(t):'Decide on the night'}</option>`).join('')}</select></label>`:''}</div>`).join('')}</div>
  <datalist id="blocks">${[...new Set(ORDER.flatMap(d=>S.week[d].map(i=>i.block)))].map(b=>`<option value="${esc(b)}">`).join('')}</datalist>
  <div class="row" style="margin-top:12px"><button class="pri" id="e-add">Add activity</button></div></div>
  <div class="grid2">
@@ -313,6 +342,8 @@ function renderEdit(){
    <label class="f" style="margin-top:12px">Workout types (one per line)<textarea id="e-wk" rows="4">${esc(S.settings.workouts.join('\n'))}</textarea></label>
    <label class="f" style="margin-top:12px">House rules (one per line)<textarea id="e-rules" rows="6">${esc(S.settings.rules.join('\n'))}</textarea></label></div>
  </div>
+ <div class="panel" style="margin-top:20px"><h2>Courses</h2><p class="small muted">Activities marked "Course" show the next lesson. Rotate alternates between courses, giving the turn to whichever you did least recently. Set where you are now:</p>
+  ${S.courses.map((c,k)=>{const ls=lz(c);return`<div class="row" style="margin:10px 0"><label class="f" style="flex:1 1 220px">${esc(c.name)} — next lesson<select data-cpos="${k}">${ls.map((l,i)=>`<option value="${i}"${i===c.pos?' selected':''}>Ch ${l.ci+1} · ${esc(l.t)}</option>`).join('')}<option value="${ls.length}"${c.pos>=ls.length?' selected':''}>Finished the course</option></select></label><label class="f" style="flex:1 1 220px">Link<input data-curl="${k}" value="${esc(c.url)}"></label></div>`}).join('')}</div>
  <div class="panel" style="margin-top:20px"><h2>Backup & move between devices</h2><p class="small muted">Everything is saved in this browser. Export to back up or move your schedule and history to another device, then paste it there and Import.</p>
   <div class="row"><button id="e-exp">Show export</button><button id="e-copyx">Copy export</button><button id="e-dl">Download .json</button><label class="f" style="flex-direction:row;align-items:center;gap:8px">Import file <input type="file" id="e-file" accept=".json,application/json"></label></div>
   <textarea id="e-io" class="small" style="margin-top:10px" placeholder="Paste an export here, then press Import pasted"></textarea>
@@ -331,6 +362,8 @@ function renderEdit(){
  const ac=v.querySelector('#e-addcat');if(ac)ac.onclick=()=>{S.cats.push({id:uid(),name:'New area',color:PAL[S.cats.length]});save();renderEdit()};
  v.querySelector('#e-start').onchange=e=>{S.settings.start=e.target.value||'21:30';save();renderEdit()};
  v.querySelector('#e-end').onchange=e=>{S.settings.end=e.target.value||'23:30';save();renderEdit()};
+ v.querySelectorAll('[data-cpos]').forEach(sel=>sel.onchange=()=>{S.courses[+sel.dataset.cpos].pos=+sel.value;save()});
+ v.querySelectorAll('[data-curl]').forEach(inp=>inp.onchange=()=>{S.courses[+inp.dataset.curl].url=inp.value.trim();save()});
  v.querySelector('#e-wk').onchange=e=>{const l=e.target.value.split('\n').map(x=>x.trim()).filter(Boolean);S.settings.workouts=l.length?l:WK.slice();save();renderEdit()};
  v.querySelector('#e-rules').onchange=e=>{S.settings.rules=e.target.value.split('\n').map(s=>s.trim()).filter(Boolean);save()};
  const io=v.querySelector('#e-io'),dump=()=>JSON.stringify(S);
