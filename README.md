@@ -14,9 +14,9 @@ To change the code later, edit `index.html` on GitHub (pencil icon) or upload a 
 
 ## How it works
 
-- **Tonight**: enter when bedtime actually ended and every start time recalculates. *Auto-fit* shrinks flexible items so you still finish by lights-out. **Protected** items (the 32nd-note runs) and **fixed-time** items (the Wednesday Preply lesson) never shrink. Tap ✓ to log an item, *Skip* to drop it for the night only, and rate your energy from 1 to 5.
-- **Progress**: streak (nights with at least 50% of planned minutes done), weekly completion, average bedtime-wrap time, average energy, minutes per focus area against the weekly plan, an 8-week heatmap and recent notes.
-- **Edit schedule**: add, remove, reorder and retime activities for each day; copy one day to others; rename focus areas; change the default start and lights-out times; edit the house rules.
+- **Tonight**: enter when bedtime actually ended and every start time recalculates. *Auto-fit* shrinks flexible items so you still finish by lights-out. **Protected** items (the 32nd-note runs) and **fixed-time** items (the Wednesday Preply lesson) never shrink. Tap ✓ to log an item, *Skip* to drop it for the night only, and rate your energy from 1 to 5. Fitness items have a workout picker: tap the type (the day's planned type is outlined with a dashed border) and note what you did. Choosing a type fills in what you did last time for that type, so a repeat workout takes one tap.
+- **Progress**: streak (nights with at least 50% of planned minutes done), weekly completion, average bedtime-wrap time, average energy, minutes per focus area against the weekly plan, an 8-week heatmap, workouts by type over the last 30 days, a workout log and recent notes.
+- **Edit schedule**: add, remove, reorder and retime activities for each day; copy one day to others; rename focus areas; change the default start and lights-out times; edit the house rules. Set each fitness night's planned workout type, and edit the list of workout types under Defaults & rules.
 
 ## Your data
 
