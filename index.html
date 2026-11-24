@@ -58,6 +58,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .wk{grid-column:2/-1;margin-top:4px;display:flex;flex-direction:column;gap:8px}.wk input{max-width:560px}.wkt{display:flex;flex-wrap:wrap;gap:6px}
 .wkt button{min-height:36px;padding:4px 12px;border-radius:18px;font-size:14px}.wkt button.on{background:#199e70;border-color:transparent;color:#06140f;font-weight:600}.wkt button.plan{border-color:#199e70;border-style:dashed}
 .wk input{width:100%;font-size:16px}
+.wake{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:end;margin-top:14px}
+.wbtn{border-style:dashed;color:var(--muted)}
+.note{background:#22304a;border:1px solid #2f4d7a;color:#d6e6ff;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:15px}
+.it.cut{opacity:.4}.it.cut .nm{color:var(--muted)}
 .en button{min-width:44px;padding:0}.en button.on{background:var(--accent);color:var(--accent-ink)}
 .grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;margin-top:20px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
@@ -169,10 +173,12 @@ function plan(items,startMin,mode,skip){
   let s=cur,gap=0;if(i.at){s=Math.max(cur,toMin(i.at));gap=s-cur}
   cur=s+d;return{...i,s,d,gap}});
  return{out,end:cur,f,winEnd,hasAnchor:ai>=0}}
+const counts=(i,L)=>!L||!L.wake||i.s<toMin(L.wake);
+const nowHM=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 const getLog=(date,create)=>{let L=S.logs[date];if(!L&&create)L=S.logs[date]={start:S.settings.start,mode:'auto',done:{},skip:{},energy:0,note:''};return L};
 function snapshot(date){const L=S.logs[date];if(!L)return;const p=plan(S.week[dayKey(date)],toMin(L.start),L.mode,L.skip);
- L.planned=p.out.reduce((a,i)=>a+i.d,0);L.doneMin=0;L.cats={};
- p.out.forEach(i=>{if(L.done[i.id]){L.doneMin+=i.d;L.cats[i.cat]=(L.cats[i.cat]||0)+i.d}})}
+ L.planned=p.out.filter(i=>counts(i,L)).reduce((a,i)=>a+i.d,0);L.doneMin=0;L.cats={};
+ p.out.forEach(i=>{if(L.done[i.id]&&counts(i,L)){L.doneMin+=i.d;L.cats[i.cat]=(L.cats[i.cat]||0)+i.d}})}
 
 /* ---------- Tonight ---------- */
 let curDate=eveningToday();
@@ -183,7 +189,8 @@ function renderTonight(){
  const L=getLog(curDate)||{start:S.settings.start,mode:'auto',done:{},skip:{},energy:0,note:''};
  const dk=dayKey(curDate),items=S.week[dk]||[];
  const p=plan(items,toMin(L.start),L.mode,L.skip);
- const planned=p.out.reduce((a,i)=>a+i.d,0),done=p.out.filter(i=>L.done[i.id]).reduce((a,i)=>a+i.d,0);
+ const planned=p.out.filter(i=>counts(i,L)).reduce((a,i)=>a+i.d,0),done=p.out.filter(i=>L.done[i.id]&&counts(i,L)).reduce((a,i)=>a+i.d,0);
+ const wk=L.wake?toMin(L.wake):null;
  const over=p.end-toMin(S.settings.end);
  let html=`<div class="panel"><div class="row">
   <label class="f">Evening of<input type="date" id="t-date" value="${curDate}"></label>
@@ -191,18 +198,20 @@ function renderTonight(){
   <label class="f">Fit mode<select id="t-mode"><option value="auto"${L.mode==='auto'?' selected':''}>Auto-fit to ${fmt(toMin(S.settings.end))}</option><option value="full"${L.mode==='full'?' selected':''}>Full plan, run late</option></select></label>
   <div class="f"><span class="small muted">Energy</span><div class="row en" style="gap:4px">${[1,2,3,4,5].map(n=>`<button data-en="${n}" class="${L.energy==n?'on':''}" aria-label="Energy ${n} of 5">${n}</button>`).join('')}</div></div>
  </div>
- <div class="sum"><span class="muted">${DNAME[dk]}<b>${dur(planned)} planned</b></span><span class="muted">Ends<b>${fmt(p.end)}</b></span><span class="muted">Done<b>${dur(done)} · ${planned?Math.round(done/planned*100):0}%</b></span>${p.f<1?`<span class="muted">Compressed<b>−${Math.round((1-p.f)*100)}% flex</b></span>`:''}</div>
+ <div class="wake">${L.wake?`<label class="f">Kid woke up at<input type="time" id="t-wake" value="${esc(L.wake)}"></label><button class="lnk" id="t-unwake">Undo wake-up</button>`:`<button id="t-wakebtn" class="wbtn">Kid woke up — end the night</button>`}</div>
+ <div class="sum"><span class="muted">${DNAME[dk]}<b>${dur(planned)} planned</b></span><span class="muted">${wk?'Ended':'Ends'}<b>${fmt(wk||p.end)}</b></span><span class="muted">Done<b>${dur(done)} · ${planned?Math.round(done/planned*100):0}%</b></span>${p.f<1?`<span class="muted">Compressed<b>−${Math.round((1-p.f)*100)}% flex</b></span>`:''}</div>
  <div class="meter" role="img" aria-label="${planned?Math.round(done/planned*100):0}% done"><i style="width:${planned?done/planned*100:0}%"></i></div>
- ${over>0&&!p.hasAnchor?`<div class="warn">This plan runs ${dur(over)} past ${fmt(toMin(S.settings.end))}. ${L.mode==='full'?'Switch to Auto-fit, or skip':'Skip'} an item tonight to finish on time.</div>`:''}
+ ${wk?`<div class="note">Night ended at ${fmt(wk)} by a wake-up. Anything after that isn't counted against you.</div>`:''}
+ ${!wk&&over>0&&!p.hasAnchor?`<div class="warn">This plan runs ${dur(over)} past ${fmt(toMin(S.settings.end))}. ${L.mode==='full'?'Switch to Auto-fit, or skip':'Skip'} an item tonight to finish on time.</div>`:''}
  ${p.hasAnchor&&p.out.some(i=>i.at&&i.s>toMin(i.at))?`<div class="warn">You'll be late for a fixed-time item — skip something before it.</div>`:''}`;
  let lastB='';
- const rows=items.map(it=>{const sk=!!L.skip[it.id];const c=p.out.find(o=>o.id===it.id);let h='';
+ const rows=items.map(it=>{const sk=!!L.skip[it.id];const c=p.out.find(o=>o.id===it.id);const cut=!!(c&&wk&&c.s>=wk);let h='';
   if(it.block!==lastB){h+=`<div class="blk">${esc(it.block||'')}</div>`;lastB=it.block}
   if(c&&c.gap>=5)h+=`<div class="free">Open time ${fmt(c.s-c.gap)} – ${fmt(c.s)} (${dur(c.gap)}) — buffer, extra reps, or rest.</div>`;
   const C=cat(it.cat);
-  h+=`<div class="it${L.done[it.id]?' done':''}${sk?' skip':''}"><div class="tm">${c?fmt(c.s).replace(/ (AM|PM)/,''):'—'}<small>${c?(c.d!==+it.min?c.d+'m <s>'+it.min+'</s>':c.d+'m'):'skipped'}</small></div>
+  h+=`<div class="it${L.done[it.id]?' done':''}${sk?' skip':''}${cut?' cut':''}"><div class="tm">${c?fmt(c.s).replace(/ (AM|PM)/,''):'—'}<small>${c?(c.d!==+it.min?c.d+'m <s>'+it.min+'</s>':c.d+'m'):'skipped'}</small></div>
    <div><div class="nm">${esc(it.name)}</div><span class="chip"><span class="dot" style="background:${C.color}"></span>${esc(C.name)}</span>${it.at?'<span class="chip">fixed '+fmt(toMin(it.at))+'</span>':''}${it.keep&&!it.at?'<span class="chip">protected</span>':''}</div>
-   <div class="acts"><button class="lnk" data-skip="${it.id}">${sk?'Restore':'Skip'}</button><button class="chk" data-done="${it.id}" aria-pressed="${!!L.done[it.id]}" aria-label="Mark ${esc(it.name)} done" ${sk?'disabled':''}>${L.done[it.id]?'✓':''}</button></div>${isFit(it)&&!sk?wkUI(it,L):''}</div>`;return h}).join('');
+   <div class="acts">${cut?'<span class="small muted">night ended</span>':`<button class="lnk" data-skip="${it.id}">${sk?'Restore':'Skip'}</button>`}<button class="chk" data-done="${it.id}" aria-pressed="${!!L.done[it.id]}" aria-label="Mark ${esc(it.name)} done" ${sk||cut?'disabled':''}>${L.done[it.id]?'✓':''}</button></div>${isFit(it)&&!sk&&!cut?wkUI(it,L):''}</div>`;return h}).join('');
  html+=(items.length?rows:'<p class="muted">Nothing scheduled for this day yet — add items under Edit schedule.</p>')+
  `<label class="f" style="margin-top:16px">Note for tonight<textarea id="t-note" placeholder="What got in the way? What went well?">${esc(L.note)}</textarea></label></div>
  <details class="panel" style="margin-top:16px"><summary>House rules</summary><ul class="rules">${S.settings.rules.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>`;
@@ -218,6 +227,9 @@ function renderTonight(){
   if(w.type===t){w.type=''}else{w.type=t;if(!w.detail)w.detail=lastDetail(t)}L2.workouts[id]=w}));
  v.querySelectorAll('[data-wd]').forEach(inp=>inp.onchange=()=>touch(L2=>{L2.workouts=L2.workouts||{};const id=inp.dataset.wd,it=items.find(x=>x.id===id),w=L2.workouts[id]||{type:'',detail:''};
   w.detail=inp.value.trim();if(!w.type&&w.detail)w.type=it&&it.workout||'';L2.workouts[id]=w;if(w.detail)L2.done[id]=true}));
+ const wb=v.querySelector('#t-wakebtn');if(wb)wb.onclick=()=>touch(L2=>L2.wake=curDate===eveningToday()?nowHM():S.settings.end);
+ const wi=v.querySelector('#t-wake');if(wi)wi.onchange=()=>touch(L2=>L2.wake=wi.value||L2.wake);
+ const wu=v.querySelector('#t-unwake');if(wu)wu.onclick=()=>touch(L2=>L2.wake='');
  v.querySelector('#t-note').onchange=e=>{const L2=getLog(curDate,true);L2.note=e.target.value;snapshot(curDate);save()};
 }
 
@@ -235,6 +247,8 @@ function renderProgress(){
  const last7=[...Array(7)].map((_,k)=>S.logs[back(k)]).filter(L=>L&&L.start);
  const avgStart=last7.length?Math.round(last7.reduce((a,L)=>a+toMin(L.start),0)/last7.length):null;
  const en=last7.filter(L=>L.energy);const avgEn=en.length?(en.reduce((a,L)=>a+L.energy,0)/en.length).toFixed(1):'—';
+ const wl30=[...Array(30)].map((_,k)=>S.logs[back(k)]).filter(L=>L&&L.wake);
+ const wkAvg=wl30.length?fmt(Math.round(wl30.reduce((a,L)=>a+toMin(L.wake),0)/wl30.length)):'';
  const lvl=p=>p<=0?'var(--h0)':p<.25?'var(--h1)':p<.5?'var(--h2)':p<.75?'var(--h3)':'var(--h4)';
  const cells=[];const gStart=new Date(wkStart);gStart.setDate(gStart.getDate()-49);
  for(let k=0;k<56;k++){const d=new Date(gStart);d.setDate(d.getDate()+k);const s=iso(d),L=S.logs[s],fut=d>today;
@@ -250,6 +264,7 @@ function renderProgress(){
   <div class="panel kpi"><div class="small muted">This week</div><div class="v">${wp?Math.round(wd/wp*100):0}%</div><div class="small muted">${dur(wd)} of ${dur(wp)} logged</div></div>
   <div class="panel kpi"><div class="small muted">Avg bedtime wrap, 7 nights</div><div class="v">${avgStart?fmt(avgStart):'—'}</div><div class="small muted">plan assumes ${fmt(toMin(S.settings.start))}</div></div>
   <div class="panel kpi"><div class="small muted">Avg energy, 7 nights</div><div class="v">${avgEn}</div></div>
+  <div class="panel kpi"><div class="small muted">Wake-ups, last 30 nights</div><div class="v">${wl30.length}</div><div class="small muted">${wl30.length?'average '+wkAvg:'none logged'}</div></div>
  </div>
  <div class="grid2">
   <div class="panel"><h2>Minutes this week by focus area</h2><p class="small muted" style="margin-top:-6px">Bar = done since Monday; marker line = full weekly plan.</p>
@@ -262,7 +277,7 @@ function renderProgress(){
   ${wTypes.map(t=>`<div class="bar" data-tip="${esc(t)}: ${wc[t]||0} sessions"><span>${esc(t)}</span><span class="tr"><i style="width:${(wc[t]||0)/wMax*100}%;background:#199e70"></i></span><span class="n">${wc[t]||0}×</span></div>`).join('')}
   ${w30.length?'':'<p class="small muted">Pick a workout type on a fitness item tonight and tick it done — it shows up here.</p>'}</div>
   <div class="panel"><h2>Workout log</h2>${wl.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Type</th><th>What you did</th></tr></thead><tbody>${wl.slice(0,12).map(x=>`<tr><td style="white-space:nowrap">${parse(x.d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${esc(x.type)}</td><td>${esc(x.detail)||'<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted small">No workouts logged yet.</p>'}</div></div>
- <div class="panel" style="margin-top:20px"><h2>Recent nights</h2>${recent.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Wrapped</th><th class="r">Done</th><th class="r">Energy</th><th>Note</th></tr></thead><tbody>${recent.map(d=>{const L=S.logs[d];return`<tr><td style="white-space:nowrap">${parse(d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${fmt(toMin(L.start))}</td><td class="r">${Math.round(pct(L)*100)}%</td><td class="r">${L.energy||'—'}</td><td>${esc(L.note)}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="muted">No nights logged yet. Tick items off on the Tonight tab and they show up here.</p>'}</div>`;
+ <div class="panel" style="margin-top:20px"><h2>Recent nights</h2>${recent.length?`<div class="scroll"><table><thead><tr><th>Date</th><th>Wrapped</th><th>Wake-up</th><th class="r">Done</th><th class="r">Energy</th><th>Note</th></tr></thead><tbody>${recent.map(d=>{const L=S.logs[d];return`<tr><td style="white-space:nowrap">${parse(d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})}</td><td style="white-space:nowrap">${fmt(toMin(L.start))}</td><td style="white-space:nowrap">${L.wake?fmt(toMin(L.wake)):'—'}</td><td class="r">${Math.round(pct(L)*100)}%</td><td class="r">${L.energy||'—'}</td><td>${esc(L.note)}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="muted">No nights logged yet. Tick items off on the Tonight tab and they show up here.</p>'}</div>`;
 }
 
 /* ---------- Edit ---------- */
